@@ -17,7 +17,7 @@ class PalmeirasSpider(scrapy.Spider):
                 tit = i.xpath(f'./td[{var}]/b/text()').get()
                 print(tit)
                 var += 1
-                temp = i.xpath(f'./td[{var}]/b/a/text()').get()
+                temp = i.xpath(f'./td[{var}]/b/a/text()').getall()
                 print(temp)
 
             elif len(i.xpath('./td')) == 3:
@@ -27,7 +27,7 @@ class PalmeirasSpider(scrapy.Spider):
                 tit = i.xpath(f'./td[{var}]/b/text()').get()
                 print(tit)
                 var += 1
-                temp = i.xpath(f'./td[{var}]/b/a/text()').get()
+                temp = i.xpath(f'./td[{var}]/b/a/text()').getall()
                 print(temp)
 
             yield {
