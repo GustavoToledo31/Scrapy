@@ -44,37 +44,45 @@ class OlxSpider(scrapy.Spider):
 
             print("O VALOR DO DETAIL É:", detail.xpath('./div/dt/text()').get())
 
-            detalhe = detail.xpath('./div/dt/text()')
+            detalhe = detail.xpath('./div/dt/text()').get()
 
-            if detalhe.get() == 'Categoria':
+            if detalhe == 'Categoria':
+                categoria = response.xpath(
+                    '//*[@id="content"]/div[2]/div/div[2]/div[1]/div[22]/div/div/div/div[2]/div[1]/div/a/text()').get()
+
+            elif detalhe == 'Tipo':
+                print("ENTREI NO TIPO")
                 try:
-                    categoria = detail.xpath('./div/a/text()').get()
-                    print("A Categoria foi:", categoria)
+                    condicao = response.xpath(
+                        '//*[@id="content"]/div[2]/div/div[2]/div[1]/div[22]/div/div/div/div[2]/div[2]/div/a/text()').get()
                 except:
-                    categoria = detail.xpath('./div/dd/text()').get()
-            elif detalhe.get() == 'Tipo':
-                try:
-                    condicao = detail.xpath('./div/a/text()').get()
-                except:
-                    condicao = detail.xpath('./div/dd/text()').get()
+                    condicao = response.xpath(
+                        '//*[@id="content"]/div[2]/div/div[2]/div[1]/div[22]/div/div/div/div[2]/div[2]/div/dd/text()').get()
 
-            elif detalhe.get() == 'Condomínio':
-                condominio = detail.xpath('./div/dd/text()').get()
+            elif detalhe == 'Condomínio':
+                print("ENTREI EM CONDOMINIO")
+                condominio = response.xpath(
+                    '//*[@id="content"]/div[2]/div/div[2]/div[1]/div[22]/div/div/div/div[2]/div[3]/div/dd/text()').get()
 
-            elif detalhe.get() == 'IPTU':
-                iptu = detail.xpath('./div/dd/text()').get()
+            elif detalhe == 'IPTU':
+                print("ENTREI NO IPTU")
+                iptu = response.xpath(
+                    '//*[@id="content"]/div[2]/div/div[2]/div[1]/div[22]/div/div/div/div[2]/div[4]/div/dd/text()').get()
 
-            elif detalhe.get() in ['Área construída', 'Tamanho', 'Área útil']:
-                area = detail.xpath('./div/dd/text()').get()
+                print("O VALOR DO IPTU É:", iptu)
 
-            elif detalhe.get() == 'Quartos':
-                quartos = detail.xpath('./div/a/text()').get()
+            elif detalhe in ['Área construída', 'Tamanho']:
+                print("ENTREI NO TAMANHO")
+                area = response.xpath(
+                    '//*[@id="content"]/div[2]/div/div[2]/div[1]/div[22]/div/div/div/div[2]/div[5]/div/dd/text()').get()
 
-            elif detalhe.get() == 'Banheiros':
-                try:
-                    banheiros = detail.xpath('./div/dd/text()').get()
-                except:
-                    banheiros = detail.xpath('./div/a/text()').get()
+            elif detalhe == 'Quartos':
+                quartos = response.xpath(
+                    '//*[@id="content"]/div[2]/div/div[2]/div[1]/div[22]/div/div/div/div[2]/div[6]/div/a/text()').get()
+
+            elif detalhe == 'Banheiros':
+                banheiros = response.xpath(
+                    '//*[@id="content"]/div[2]/div/div[2]/div[1]/div[22]/div/div/div/div[2]/div[7]/div/dd/text()').get()
 
         yield {
             "Tipo_do_Produto": nome_tipo_2,
