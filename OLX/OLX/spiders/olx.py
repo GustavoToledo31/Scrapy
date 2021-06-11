@@ -37,12 +37,10 @@ class OlxSpider(scrapy.Spider):
         preco = response.xpath(
             '//*[@id="content"]/div[2]/div/div[2]/div[1]/div[12]/div/div/div/div/div[1]/div/h2/text()').get()
 
-        categoria, condicao, condominio, iptu, area, quartos, banheiros = [
-            np.NaN] * 7
+        categoria, condicao, condominio, iptu, area, quartos, banheiros, cep, municipio, bairro, logradouro = [
+            np.NaN] * 11
 
         for detail in response.xpath('//*[@id="content"]/div[2]/div/div[2]/div[1]/div[22]/div/div/div/div[2]/div'):
-
-            print("O VALOR DO DETAIL É:", detail.xpath('./div/dt/text()').get())
 
             detalhe = detail.xpath('./div/dt/text()')
 
@@ -76,6 +74,28 @@ class OlxSpider(scrapy.Spider):
                 except:
                     banheiros = detail.xpath('./div/a/text()').get()
 
+        for localizacao in response.xpath('//*[@id="content"]/div[2]/div/div[2]/div[1]/div[25]/div/div/div/div[1]/div[2]/div'):
+
+            localiza = localizacao.xpath('./div/dt/text()')
+
+            print("O VALOR DO LOCALIZA É:", localiza.get())
+
+            if localiza.get() == 'CEP':
+                cep = localizacao.xpath('./div/dd/text()').get()
+                print("ESSE FOI O CEP EXTRAIDO:", cep)
+
+            elif localiza.get() == 'Município':
+                municipio = localizacao.xpath('./div/dd/text()').get()
+                print("ESSE FOI O MUNICIPIO EXTRAIDO:", municipio)
+
+            elif localiza.get() == 'Bairro':
+                bairro = localizacao.xpath('./div/dd/text()').get()
+                print("ESSE FOI O bairro EXTRAIDO:", bairro)
+
+            elif localiza.get() == 'Logradouro':
+                logradouro = localizacao.xpath('./div/dd/text()').get()
+                print("ESSE FOI O logradouro EXTRAIDO:", logradouro)
+
         yield {
             "Tipo_do_Produto": nome_tipo_2,
             "Descricao": nome_anuncio,
@@ -86,5 +106,9 @@ class OlxSpider(scrapy.Spider):
             "IPTU": iptu,
             "Area": area,
             "Quantidade_Quartos": quartos,
-            "Quantidade_Banheiros": banheiros
+            "Quantidade_Banheiros": banheiros,
+            "CEP": cep,
+            "Municipio": municipio,
+            "Bairro": bairro,
+            "Logradouro": logradouro
         }
