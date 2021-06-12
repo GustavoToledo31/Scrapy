@@ -12,23 +12,32 @@ class OlxSpider(scrapy.Spider):
             '// *[@id="gatsby-focus-wrapper"]/div[3]/div[1]/div[2]/div[2]/div/div/ul/li[1]')
 
         nome_tipo = tipo.xpath("./a/small/text()").get()
-        href = tipo.xpath("./a/@href").get()
 
-        yield scrapy.Request(
-            url=href,
-            callback=partial(self.parse_detail, nome_tipo)
-        )
-
-    def parse_detail(self, nome_tipo_1, response):
-        print(response)
-        for i in [1, 2, 5, 6, 7, 9] + list(range(10, 26)) + list(range(27, 37)) + list(range(38, 56)):
-            anuncio = response.xpath(f'//*[@id="ad-list"]/li[{i}]')
-            href = anuncio.xpath('./a/@href').get()
+        for anuncio in range(1, 101):
+            if anuncio == 1:
+                href_page = 'https://sp.olx.com.br/imoveis'
+            else:
+                href_page = f'https://sp.olx.com.br/imoveis?o={anuncio}'
 
             yield scrapy.Request(
-                url=href,
+                url=href_page,
+                callback=partial(self.parse_detail, nome_tipo)
+            )
+
+    def parse_detail(self, nome_tipo_1, response):
+        # for anuncio in range(2, 101):
+        # Eu estava fazendo com esse for, mas pode ser que de um looping infinito
+        for i in [1, 2, 5, 6, 7, 9] + list(range(10, 26)) + list(range(27, 37)) + list(range(38, 56)):
+            anuncio = response.xpath(f'//*[@id="ad-list"]/li[{i}]')
+            href_advertisement = anuncio.xpath('./a/@href').get()
+
+            yield scrapy.Request(
+                url=href_advertisement,
                 callback=partial(self.parse_final_imoveis, nome_tipo_1)
             )
+
+        #href_page = f'https://sp.olx.com.br/imoveis?o={anuncio}'
+        # Esse é o código para acessar cada página
 
     def parse_final_imoveis(self, nome_tipo_2, response):
         nome_anuncio = response.xpath(
@@ -47,7 +56,6 @@ class OlxSpider(scrapy.Spider):
             if detalhe.get() == 'Categoria':
                 try:
                     categoria = detail.xpath('./div/a/text()').get()
-                    print("A Categoria foi:", categoria)
                 except:
                     categoria = detail.xpath('./div/dd/text()').get()
             elif detalhe.get() == 'Tipo':
@@ -78,23 +86,17 @@ class OlxSpider(scrapy.Spider):
 
             localiza = localizacao.xpath('./div/dt/text()')
 
-            print("O VALOR DO LOCALIZA É:", localiza.get())
-
             if localiza.get() == 'CEP':
                 cep = localizacao.xpath('./div/dd/text()').get()
-                print("ESSE FOI O CEP EXTRAIDO:", cep)
 
             elif localiza.get() == 'Município':
                 municipio = localizacao.xpath('./div/dd/text()').get()
-                print("ESSE FOI O MUNICIPIO EXTRAIDO:", municipio)
 
             elif localiza.get() == 'Bairro':
                 bairro = localizacao.xpath('./div/dd/text()').get()
-                print("ESSE FOI O bairro EXTRAIDO:", bairro)
 
             elif localiza.get() == 'Logradouro':
                 logradouro = localizacao.xpath('./div/dd/text()').get()
-                print("ESSE FOI O logradouro EXTRAIDO:", logradouro)
 
         yield {
             "Tipo_do_Produto": nome_tipo_2,
